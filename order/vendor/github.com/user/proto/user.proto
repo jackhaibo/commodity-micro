@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package proto;
+//protoc --proto_path=. --micro_out=. --go_out=. user.proto
+service User {
+    rpc GetUserById (GetUserByIdRequest) returns (GetUserByIdResponse) {
+    }
+    rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+    }
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    }
+    rpc Login (LoginRequest) returns (LoginResponse) {
+    }
+    rpc Register (RegisterRequest) returns (RegisterResponse) {
+    }
+}
+
+message GetUserByIdRequest {
+    int64 userId = 1;
+}
+
+message GetUserByIdResponse {
+    int64 id = 1;
+    string Name = 2;
+    int32 Age = 3;
+    int32 Gender = 4;
+    string NickName = 5;
+}
+
+message GetUserRequest {
+    string Name = 1;
+    string Password = 2;
+}
+
+message GetUserResponse {
+    int64 Id = 1;
+    string Name = 2;
+    int32 Age = 3;
+    int32 Gender = 4;
+    string NickName = 5;
+    string Password = 6;
+}
+
+message CreateUserRequest {
+    int64 Id = 1;
+    string Name = 2;
+    int32 Age = 3;
+    int32 Gender = 4;
+    string NickName = 5;
+    string PassWord = 6;
+}
+
+message CreateUserResponse {
+}
+
+message LoginRequest {
+    string name = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string Id = 1;
+    string Name = 2;
+    string Age = 3;
+    string Gender = 4;
+    string NickName = 5;
+}
+
+message RegisterRequest {
+    string name = 1;
+    string password = 2;
+    string age = 3;
+    string gender = 4;
+    string nickname = 5;
+}
+
+message RegisterResponse {
+}

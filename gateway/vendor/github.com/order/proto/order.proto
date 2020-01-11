@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proto;
+//protoc --proto_path=. --micro_out=. --go_out=. order.proto
+service Order {
+    rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {
+    }
+}
+
+message CreateOrderRequest {
+    string itemId = 1;
+    string promoId = 2;
+    string amount = 3;
+    int64 userId = 4;
+}
+
+message CreateOrderResponse {
+}

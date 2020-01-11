@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package proto;
+//protoc --proto_path=. --micro_out=. --go_out=. item.proto
+service Item {
+    rpc ListItem (ListItemRequest) returns (ListItemResponse) {
+    }
+    rpc GetItem (GetItemRequest) returns (GetItemResponse) {
+    }
+    rpc CreateItem (CreateItemRequest) returns (CreateItemResponse) {
+    }
+    rpc PublishPromo (PublishPromoRequest) returns (PublishPromoResponse) {
+    }
+}
+
+message ListItemRequest {
+}
+
+message ListItemResponse {
+    repeated ItemModel item = 1;
+}
+
+message ItemModel {
+    string Id = 1;
+    string Title = 2;
+    string Price = 3;
+    string Description = 4;
+    string Sales = 5;
+    string Stock = 6;
+    string ImgUrl = 7;
+    string PromoStatus = 8;
+    string PromoId = 9;
+    string StartDate = 10;
+    string PromoPrice = 11;
+}
+
+message GetItemRequest {
+    string id = 1;
+}
+
+message GetItemResponse {
+    ItemModel item = 1;
+}
+
+message CreateItemRequest {
+    string title = 1;
+    string description = 2;
+    string price = 3;
+    string stock = 4;
+    string imgUrl = 5;
+}
+
+message CreateItemResponse {
+    ItemModel item = 1;
+}
+
+message PublishPromoRequest {
+    string itemId = 1;
+    string promItemPrice = 2;
+    string startDateStr = 3;
+    string endDateStr = 4;
+}
+
+message PublishPromoResponse {
+}
