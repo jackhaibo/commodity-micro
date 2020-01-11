@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="static/css/bootstrap.css">
+    <link rel="stylesheet" href="static/css/components.css">
+    <link rel="stylesheet" href="static/css/login.css">
+    <script src="static/js/gethost.js"></script>
+    <script src="static/js/jquery-1.11.0.min.js"></script>
+</head>
+<body class="login">
+<div class="content">
+    <h3 class="form-title">发布秒杀</h3>
+    <div class="form-group">
+        <label class="control-label">秒杀价格</label>
+        <div>
+            <input class="form-control" type="text" placeholder="秒杀价格" name="promo_item_price" id="promo_item_price"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label">开始时间</label>
+        <div>
+            <input class="form-control" type="text" placeholder="开始时间" name="start_date" id="start_date"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label">结束时间</label>
+        <div>
+            <input class="form-control" type="text" placeholder="结束时间" name="end_date" id="end_date"/>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button class="btn blue" id="finish" type="submit">
+            完成
+        </button>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        //绑定otp的click时间用于向后端发送获取手机验证码的请求
+        $("#finish").click(function () {
+            var price = $("#promo_item_price").val();
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
+            var item_id = getParam("id");
+
+            if (price == null || price === "") {
+                alert("秒杀价格不能为空");
+                return false;
+            }
+            if (start_date == null || start_date === "") {
+                alert("开始时间不能为空");
+                return false;
+            }
+            if (end_date == null || end_date === "") {
+                alert("结束时间不能为空");
+                return false;
+            }
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/x-www-form-urlencoded",
+                url: "http://" + g_host + "/item/publishpromo",
+                data: {
+                    "itemId": item_id,
+                    "promItemPrice": price,
+                    "startDate": start_date,
+                    "endDate": end_date
+                },
+                xhrFields: {withCredentials: true},
+                success: function (data) {
+                    if (data.status === "success") {
+                        alert("发布成功");
+                        window.location.href = "getitem.html?id=" + item_id;
+                    } else {
+                        alert("发布失败，原因为" + data.message);
+                    }
+                },
+                error: function (data) {
+                    redirect("发布失败，原因为", data);
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,50 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/css/bootstrap.css">
+    <link rel="stylesheet" href="static/css/components.css">
+    <link rel="stylesheet" href="static/css/login.css">
+    <script src="static/js/gethost.js"></script>
+    <script src="static/js/jquery-1.11.0.min.js"></script>
+</head>
+<body class="login">
+<div class="content">
+    <h3 class="form-title">商品列表页</h3>
+</div>
+</body>
+<script>
+    //定义全局商品数组信息
+    var g_itemList = [];
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: "http://" + g_host + "/item/list",
+            xhrFields: {withCredentials: true},
+            success: function (data) {
+                if (data.status === "success") {
+                    g_itemList = data.data;
+                    reloadDom();
+                } else {
+                    alert("获取商品信息失败，原因为" + data.data.errMsg);
+                }
+            },
+            error: function (data) {
+                redirect("获取商品信息失败，原因为 ", data);
+            }
+        });
+    });
+
+    function reloadDom() {
+        for (var i = 0; i < g_itemList.length; i++) {
+            var itemVO = g_itemList[i];
+            var dom = "<div data-id='" + itemVO.id + "' id='itemDetail" + itemVO.id + "'><div class='form-group'><div><img style='width:200px;height:auto' src='" + itemVO.imgUrl + "'/></div></div><div class='form-group'><div><label class='control-label'>" + itemVO.title + "</label></div></div><div class='form-group'><label class='control-label'>价格</label><div><label class='control-label'>" + itemVO.price + "</label></div></div><div class='form-group'><label class='control-label'>销量</label><div><label class='control-label'>" + itemVO.sales + "</label></div></div></div>";
+
+            $(".content").append($(dom));
+
+            $("#itemDetail" + itemVO.id).click(function () {
+                window.location.href = "getitem.html?id=" + $(this).data("id");
+            });
+        }
+    }
+</script>
+</html>
