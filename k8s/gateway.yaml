@@ -1,0 +1,76 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway 
+  namespace: default 
+spec:
+  rules:
+    - host: gateway.ctnrs.com 
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: gateway
+            servicePort: 9999
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: default
+spec:
+  ports:
+  - port: 9999 
+    name: gateway
+  selector:
+    app: gateway
+---
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: gateway
+  namespace: default 
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      imagePullSecrets:
+      - name: registry-pull-secret
+      containers:
+      - name: gateway
+        image: 192.168.31.70/microservice/gateway:2019-07-10-21-26-23
+        imagePullPolicy: IfNotPresent
+        args:
+          - "-c=/config/dev/commodity"
+          - "-d=5"
+          - "-e=localhost:2379"
+        resources:
+          requests:
+            cpu: 2
+            memory: 256Mi
+          limits:
+            cpu: 4
+            memory: 256Mi
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh 
+            - -c
+            - ps -ef | grep gateway | grep -v grep 
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh 
+            - -c
+            - ps -ef | grep gateway | grep -v grep 
+          initialDelaySeconds: 5
+          periodSeconds: 10

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: item
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: item
+  template:
+    metadata:
+      labels:
+        app: item
+    spec:
+      imagePullSecrets:
+      - name: registry-pull-secret
+      containers:
+      - name: item
+        image: 192.168.31.70/microservice/stock:2019-07-10-20-41-44
+        imagePullPolicy: IfNotPresent
+        args:
+          - "-c=/config/dev/commodity"
+          - "-d=5"
+          - "-e=localhost:2379"
+        resources:
+          requests:
+            cpu: 2
+            memory: 256Mi
+          limits:
+            cpu: 4
+            memory: 256Mi
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh 
+            - -c
+            - ps -ef | grep item | grep -v grep 
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh 
+            - -c
+            - ps -ef | grep item | grep -v grep 
+          initialDelaySeconds: 5
+          periodSeconds: 10
