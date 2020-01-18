@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"github.com/common/cache"
 	c "github.com/common/config"
 	pool "github.com/common/goroutine_pool"
@@ -20,6 +20,7 @@ import (
 	"github.com/micro/go-micro/transport/grpc"
 	"github.com/micro/go-plugins/registry/etcdv3"
 	"log"
+	"os"
 	"strconv"
 )
 
@@ -32,14 +33,25 @@ var (
 	configkey       string
 )
 
-func init() {
-	flag.IntVar(&etcdDialTimeout, "d", 5, "etcd dial timeout")
-	flag.StringVar(&etcdEndpoint, "e", "localhost:2379", "etcd endpoint")
-	flag.StringVar(&configkey, "c", "/config/dev/commodity", "config key in etcd")
-}
-
 func main() {
-	flag.Parse()
+	timeout := os.Getenv("ETCD_DIAL_TIMEOUT")
+	if timeout == "" {
+		etcdDialTimeout = 5
+	} else {
+		etcdDialTimeout, _ = strconv.Atoi(timeout)
+	}
+
+	etcdEndpoint = os.Getenv("ETCD_END_POINT")
+	if etcdEndpoint == "" {
+		etcdEndpoint = "localhost:2379"
+	}
+
+	configkey = os.Getenv("CONFIG_KEY")
+	if configkey == "" {
+		configkey = "/config/dev/commodity"
+	}
+
+	fmt.Println(etcdDialTimeout, etcdEndpoint, configkey)
 
 	config, err := c.GetEtcdMgr(etcdDialTimeout, etcdEndpoint, configkey).GetConfigFromEtcd(iniComponent)
 	if err != nil {

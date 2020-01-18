@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/common/cache"
@@ -28,15 +30,25 @@ var (
 	configkey       string
 )
 
-func init() {
-	flag.IntVar(&etcdDialTimeout, "d", 5, "etcd dial timeout")
-	flag.StringVar(&etcdEndpoint, "e", "localhost:2379", "etcd endpoint")
-	flag.StringVar(&configkey, "c", "/config/dev/commodity", "config key in etcd")
-}
-
-//sql语句调优
 func main() {
-	flag.Parse()
+	timeout := os.Getenv("ETCD_DIAL_TIMEOUT")
+	if timeout == "" {
+		etcdDialTimeout = 5
+	} else {
+		etcdDialTimeout, _ = strconv.Atoi(timeout)
+	}
+
+	etcdEndpoint = os.Getenv("ETCD_END_POINT")
+	if etcdEndpoint == "" {
+		etcdEndpoint = "localhost:2379"
+	}
+
+	configkey = os.Getenv("CONFIG_KEY")
+	if configkey == "" {
+		configkey = "/config/dev/commodity"
+	}
+
+	fmt.Println(etcdDialTimeout, etcdEndpoint, configkey)
 
 	config, err := c.GetEtcdMgr(etcdDialTimeout,etcdEndpoint,configkey).GetConfigFromEtcd(iniComponent)
 	if err != nil {

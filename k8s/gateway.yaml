@@ -1,19 +1,19 @@
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: gateway 
-  namespace: default 
-spec:
-  rules:
-    - host: gateway.ctnrs.com 
-      http:
-        paths:
-        - path: /
-          backend:
-            serviceName: gateway
-            servicePort: 9999
----
+# ---
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: gateway 
+#   namespace: default 
+# spec:
+#   rules:
+#     - host: gateway.ctnrs.com 
+#       http:
+#         paths:
+#         - path: /
+#           backend:
+#             serviceName: gateway
+#             servicePort: 9999
+# ---
 apiVersion: v1
 kind: Service
 metadata:
@@ -21,7 +21,7 @@ metadata:
   namespace: default
 spec:
   ports:
-  - port: 9999 
+  - port: 9091
     name: gateway
   selector:
     app: gateway
@@ -32,7 +32,7 @@ metadata:
   name: gateway
   namespace: default 
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: gateway
@@ -45,32 +45,41 @@ spec:
       - name: registry-pull-secret
       containers:
       - name: gateway
-        image: 192.168.31.70/microservice/gateway:2019-07-10-21-26-23
-        imagePullPolicy: IfNotPresent
-        args:
-          - "-c=/config/dev/commodity"
-          - "-d=5"
-          - "-e=localhost:2379"
+        image: 192.168.134.104/commodity/gateway:v1.0
+        imagePullPolicy: Always
+        ports:
+          - protocol: TCP
+            containerPort: 9092
+        env:
+          - name: ETCD_DIAL_TIMEOUT
+            valueFrom:
+              configMapKeyRef:
+                name: commodity-configmap
+                key: etcddialtimeout
+          - name: ETCD_END_POINT
+            valueFrom:
+              configMapKeyRef:
+                name: commodity-configmap
+                key: etcdendpoint
+          - name: CONFIG_KEY
+            valueFrom:
+              configMapKeyRef:
+                name: commodity-configmap
+                key: configkey
         resources:
           requests:
             cpu: 2
             memory: 256Mi
           limits:
             cpu: 4
-            memory: 256Mi
+            memory: 1Gi
         readinessProbe:
-          exec:
-            command:
-            - /bin/sh 
-            - -c
-            - ps -ef | grep gateway | grep -v grep 
-          initialDelaySeconds: 5
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 60
           periodSeconds: 10
         livenessProbe:
-          exec:
-            command:
-            - /bin/sh 
-            - -c
-            - ps -ef | grep gateway | grep -v grep 
-          initialDelaySeconds: 5
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 60
           periodSeconds: 10

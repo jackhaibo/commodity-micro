@@ -4,7 +4,7 @@ metadata:
   name: order
   namespace: default
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: order
@@ -17,12 +17,24 @@ spec:
       - name: registry-pull-secret
       containers:
       - name: order
-        image: 192.168.31.70/microservice/stock:2019-07-10-20-41-44
-        imagePullPolicy: IfNotPresent
-        args:
-          - "-c=/config/dev/commodity"
-          - "-d=5"
-          - "-e=localhost:2379"
+        image: 192.168.134.104/commodity/order:v1.0
+        imagePullPolicy: Always
+        env:
+          - name: ETCD_DIAL_TIMEOUT
+            valueFrom:
+              configMapKeyRef:
+                name: commodity-configmap
+                key: etcddialtimeout
+          - name: ETCD_END_POINT
+            valueFrom:
+              configMapKeyRef:
+                name: commodity-configmap
+                key: etcdendpoint
+          - name: CONFIG_KEY
+            valueFrom:
+              configMapKeyRef:
+                name: commodity-configmap
+                key: configkey
         resources:
           requests:
             cpu: 2

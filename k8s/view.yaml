@@ -5,7 +5,7 @@ metadata:
   namespace: default 
 spec:
   rules:
-    - host: portal.ctnrs.com 
+    - host: www.portal.com 
       http:
         paths:
         - path: /
@@ -32,7 +32,7 @@ metadata:
   name: portal
   namespace: default 
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       project: default
@@ -47,8 +47,8 @@ spec:
       - name: registry-pull-secret
       containers:
       - name: portal
-        image: 192.168.31.70/microservice/portal:2019-07-10-21-35-13
-        imagePullPolicy: IfNotPresent
+        image: 192.168.134.104/commodity/view:v1.0
+        imagePullPolicy: Always
         ports:
           - protocol: TCP
             containerPort: 8088 
